@@ -8,3 +8,4 @@ Thi repo contains the following folders:
 - `scripts`: contains all your scripts
 - `stores`: contains all the data sets used. If files are "too big" for GitHub, include a document describing where people can access the data.
 - `views`: contains all figures and tables
+- `biblio`: contains the extra files and bibliography
