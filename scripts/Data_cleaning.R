@@ -37,4 +37,4 @@ tail(db)
 skim(db)
 
 ## Handeling with missing values
-skim(db)
+
