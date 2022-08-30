@@ -19,22 +19,40 @@ p_load(  rio, # import/export data
          broom, ## tidy function
          broom.mixed,
          skimr,
-         stargazer,sandwich, kable, kableExtra)
+         stargazer,sandwich, kable, kableExtra,ggplot2,GGally, ggcorrplot,stargazer, xtable, hrbrthemes)
 
 ## Import dataset
 
 df <- import(here("./stores/data.csv"))
 
-db <- as_tibble(df) ## from dataframe to tibble
-
-## Filter by age >18
+## Filter by age >18 & Cleaning Data set
 ##NOTE: Confirm if this should be '>' or '>=' 
-db <- db[db$age >=18,]
+df <- df[df$age >=18,]
+
+data <- df %>% select(!matches(c(("^p[0-9]"), "^cc", "^io", "^y_", "^fex", "^hours"))) %>% select(-(ina:ingtotes), -c(depto,dominio ,clase, V1, wap, directorio, secuencia_p, pet, orden, mes, fweight, informal, cuentaPropia, pea, microEmpresa)) %>% replace_na(list(oficio = 0, relab = 0, totalHoursWorked = 0)) 
+
 ## Descriptives
-head(db)
-tail(db)
+skim(data)
 
-skim(db)
+stargazer(data)
 
-## Handeling with missing values
+# Check correlations (as scatterplots), distribution and print corrleation coefficient
 
+#db <- as_tibble(df) ## from dataframe to tibble
+
+data_plot <- data %>% select(-c('regSalud','cotPension','formal','sizeFirm','maxEducLevel'))
+
+corr <- round(cor(data_plot), 1)
+
+ggcorrplot(corr, method = 'circle', type = 'lower', lab = TRUE) +
+  ggtitle("Correlograma de base de ingresos") +
+  theme_minimal() +
+  theme(legend.position="none")
+
+##Histogram Ingreso
+
+ggplot(data, aes(x=ingtot))+ geom_histogram()+
+  ggtitle("Ingresos Totales") +
+  theme_ipsum() 
+
+##Boxplot by Gender
