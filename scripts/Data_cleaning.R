@@ -2,7 +2,7 @@
 # Cleaning Data
 rm(list = ls())
 
-setwd(r'(C:\Users\juan.velasquez\OneDrive - Universidad de los Andes\Maestria\Semestres\2022-2\BIG DATA & MACHINE LEARNING FOR APPLIED ECONOMICS\Talleres\Problem-Set1)')
+setwd(r'(C:\Users\rasantofimior\Documents\GitHub\Problem-Set1)')
 
 ## install pacman
 if(!require(pacman)) install.packages("pacman") ; require(pacman)
@@ -117,6 +117,17 @@ boot.ci(plotbot, type="bca")
 ggplot(data, aes(y=predict(mod_age), x= age)) + 
   labs(x='Age', y='Predicted Values', title='Predicted Values vs. Age')+ geom_point() 
 
-  
-  
-  
+#################################Punto 3########################################
+# a
+
+lnincome <- log(y_salary_m)
+mod_female <- lm("lnincome ~ sex" , data= data)
+summary(mod_female)
+results2 = tidy(mod_female)
+stargazer(mod_female, dep.var.labels=c("Ln(income)") , out="./views/Modelo_sex_gap.tex")
+
+#b
+mod_Pfemale <- lm("lnincome ~ sex + (sex*age) + (sex*I(age^2)) + age + I(age^2)" , data= data)
+summary(mod_Pfemale)
+results3 = tidy(mod_Pfemale)
+stargazer(mod_Pfemale, dep.var.labels=c("Ln(income)") , out="./views/Modelo_age_earnings_profile.tex")
