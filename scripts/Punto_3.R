@@ -107,49 +107,31 @@ summary(mod_Pfemale)
 results3 = tidy(mod_Pfemale)
 stargazer(mod_Pfemale, dep.var.labels=c("Ln(income)") , out="./views/Modelo_age_earnings_profile.tex")
 
-#### sd and if sex
-library(ggplot2)
-
-ggplot(data, aes(y=predict(mod_Pfemale), x= age))+
-  geom_point() +
-  geom_line(aes(y=lwr), color="red", linetype="dashed") +
-  geom_line(aes(y=upr), color="red", linetype="dashed") +
-  geom_smooth(method=lm, formula= lnincome ~ sex + (sex*age) + (sex*I(age^2)) + age + I(age^2), se=TRUE, level=0.95, col='blue', fill='pink2') +
-  theme_light()
-
-#plot predicted vs. actual values
-data$UperCI <- predict(mod_age) +(1.96*12527.290)
-data$LowerCI <- predict(mod_age) -(1.96*12527.290)
-
-ggplot(data, aes(y=predict(mod_age), x= age)) + 
-  labs(x='Edad', y='Salario predicho', title='Salarios Predichos vs. Edad (95% IC)')+ 
-  geom_point()+geom_line(aes(y = UperCI), color = "red", linetype = "dashed")+
-  geom_line(aes(y = LowerCI), color = "red", linetype = "dashed")
 
 # c
 
 ## install fastDummies
 if(!require(fastDummies)) install.packages("fastDummies") ; require(fastDummies)
 require(fastDummies)
-
 data <- dummy_cols(data, select_columns = c('mes', 'oficio', 'relab', 'maxEducLevel', 'sizeFirm'), remove_first_dummy = TRUE, remove_selected_columns = TRUE)
 data2 <- data %>% select(sex, age, formal, totalHoursWorked, mes_2:maxEducLevel_7)
+data2$lnincome2 <- log(y_salary_m)
+data2 <- data2 %>% replace_na(list(lnincome2 = mean(data2$lnincome2, na.rm = TRUE)))
 
-lnincome2 <- log(y_salary_m)
 mod_PPfemale <- lm(lnincome2 ~ sex + (sex*age) + (sex*I(age^2)) + age + I(age^2)+., data= data2)
 summary(mod_PPfemale)
 results4 = tidy(mod_PPfemale)
 stargazer(mod_PPfemale, dep.var.labels=c("Ln(income)") , out="./views/Modelo_age_earnings_gap_controls.tex")
 
+names_vars <- data2 %>% dplyr::select(-c(2)) %>% colnames()
+independiente <- " ~ age"
+formulas <- paste0(names_vars, independiente)
 
-data2<-cbind(data2,lnincome2, I(age^2))
-
-mod_summaries <- list()
-
-for(i in 2:ncol(data2)) {                 # Head of for-loop
-  
-  predictors_i <- colnames(data2)[2:i]    # Create vector of predictor names
-  mod_summaries[[i - 1]] <- summary(     # Store regression model summary in list
-    lm(sex ~., data[ , c("sex", predictors_i)]))
-  
+for(x in formulas) { 
+  data2[x] <- lm(x, data2)$residuals
 }
+
+data3 <- data2 %>% dplyr::select(matches("~ age$"))
+reg2<-lm(`lnincome2 ~ age` ~ . - 1, data = data3)
+
+# 0.0806
