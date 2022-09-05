@@ -1,4 +1,4 @@
-source("./scripts/data_cleaning.R")
+source("../scripts/data_cleaning.R")
 library("skimr")
 library("ggcorrplot")
 library("stargazer")
@@ -53,7 +53,7 @@ mod_age <- lm("ingtot ~ age + I(age^2)", data = data)
 
 summary(mod_age)
 results <- tidy(mod_age)
-stargazer(mod_age, dep.var.labels = c("Earnings"), out = "./views/Modelo_Age.tex")
+stargazer(mod_age, dep.var.labels = c("Earnings"), out = "../views/Modelo_Age.tex")
 
 
 beta.fn <- function(data, index) {
