@@ -1,11 +1,17 @@
 # Repositoiro para el curso Big Data and Machine Learning for Applied Economics Problem Set 1
 
-This is a repository for the Problem Set 1 from Big Data and Machine Learning for Applied Economics course at 2022 Fall. 
+Este repositorio corresponde al Problem Set 1 del curso Big Data and Machine Learning for Applied Economics 2022. 
 
-Thi repo contains the following folders:
+
 # Resumen
 
 Para el sector fiscal, la correcta implemetación de políticas públicas y reformas tributarias han sido temáticas importantes a la hora de poder formar naciones con sociedades crecientes en ingreso pero con redistribuciones que pérmitan una equidad para los sectores marginales con igualdad de oportunidades. En un mundo ideal el gobierno tendría control total al observar los ingresos de todas las personas, sin embargo actualmente las personas suelen subreportar estas cifras con temor a ser segmentada bajo una tasa proporsional a sus ingresos.  Con base en lo anterior, se vuelve de suma importancia obtener herramientas que nos permitan tener estimaciones de los ingresos de las personas y llegar a cuestionarnos si debido a un subreporte de los mismos se estan teniendo impuestos suboptimos. Más importante aún si dentro de los multiples modelos posibles, el gobierno y entidades reguladoras se debería enfocar en ciertas observaciones atipicas para llegar a una estimación cercana.
+
+Este repositorio contiene las siguientes carpetas:
+## Carpeta Document
+-ProblemSet1.pdf:
+Este docuemnto contiene el trabajo escrito del Problem Set 1 con los resultados totalmente replicables.
+
 
 ## Carpeta Stores 
 - data.csv: 
