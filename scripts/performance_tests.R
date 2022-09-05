@@ -1,4 +1,4 @@
-source("./scripts/Data_cleaning.R")
+source("./scripts/data_cleaning.R")
 library("caret")
 library("doSNOW")
 library("foreach")
