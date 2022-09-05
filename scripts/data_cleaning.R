@@ -1,6 +1,6 @@
 library("tidyverse")
 
-df <- read.csv("./stores/data.csv")
+df <- read.csv("../stores/data.csv")
 
 ## Filter by age >18 & Cleaning Data set
 df <- df[df$age >= 18, ]
