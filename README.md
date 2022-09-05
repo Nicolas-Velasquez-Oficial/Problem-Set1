@@ -9,7 +9,7 @@ Para el sector fiscal, la correcta implemetación de políticas públicas y refo
 
 Este repositorio contiene las siguientes carpetas:
 ## Carpeta Document
--ProblemSet1.pdf:
+-Problem_Set_1.pdf:
 Este docuemnto contiene el trabajo escrito del Problem Set 1 con los resultados totalmente replicables.
 
 
