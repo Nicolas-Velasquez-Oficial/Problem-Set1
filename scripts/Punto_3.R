@@ -1,137 +1,164 @@
-#################################Punto 1########################################
+################################# Punto 1########################################
 # Cleaning Data
 rm(list = ls())
 
 setwd(r'(C:\Users\rasantofimior\Documents\GitHub\Problem-Set1)')
 
 ## install pacman
-if(!require(pacman)) install.packages("pacman") ; require(pacman)
+if (!require(pacman)) install.packages("pacman")
+require(pacman)
 ## Loading required package: pacman
 
 ## Load relevant packages
 require(pacman)
-p_load(  rio, # import/export data
-         tidyverse, # tidy-data
-         skimr, # summary data
-         caretidyverse,
-         here,
-         jtools, ## summ function
-         ggstance,
-         broom, ## tidy function
-         broom.mixed,
-         skimr,
-         stargazer,sandwich, kable, kableExtra,ggplot2,GGally, ggcorrplot,stargazer, xtable, hrbrthemes,boot, dplyr)
+p_load(
+  rio, # import/export data
+  tidyverse, # tidy-data
+  skimr, # summary data
+  caretidyverse,
+  here,
+  jtools, ## summ function
+  ggstance,
+  broom, ## tidy function
+  broom.mixed,
+  skimr,
+  stargazer, sandwich, kable, kableExtra, ggplot2, GGally, ggcorrplot, stargazer, xtable, hrbrthemes, boot, dplyr
+)
+
+library("tidyverse")
+library("stargazer")
+library("boot")
 
 ## Import dataset
 
-df <- import(here("./stores/data.csv"))
+df <- read.csv("./stores/data.csv")
 
 ## Filter by age >18 & Cleaning Data set
-##NOTE: Confirm if this should be '>' or '>=' 
-df <- df[df$age >=18,]
-df <- df[df$ocu ==1,]
+df <- df[df$age >= 18, ]
+df <- df[df$ocu == 1, ]
+df <- df %>% mutate(female = ifelse(sex == 1, 0, 1))
+y_salary_m <- df$y_salary_m
+y_ingLab_m <- df$y_ingLab_m
+y_total_m <- df$y_total_m
 
-data <- df %>% select(!matches(c(("^p[0-9]"), "^cc", "^io", "^y_", "^fex", "^hours"))) %>% select(-(ina:ingtotes), -c(depto,dominio, V1, wap, directorio, secuencia_p, pet, orden, fweight, informal, cuentaPropia, pea, microEmpresa, ocu, dsi, inac, clase)) %>% replace_na(list(oficio = 0, relab = 0, totalHoursWorked = 0))
+data <- df %>%
+  select(!matches(c(("^p[0-9]"), "^cc", "^io", "^y_", "^fex", "^hours"))) %>%
+  select(
+    -(ina:ingtotes),
+    -c(
+      depto, dominio, clase, V1, wap, directorio, secuencia_p, pet, orden,
+      mes, fweight, informal, cuentaPropia, pea, microEmpresa, ocu, dsi,
+      inac, sex
+    )
+  ) %>%
+  replace_na(list(oficio = 0, relab = 0, totalHoursWorked = 0))
 
-y_salary_m = df$y_salary_m
+data$y_ingLab_m <- y_ingLab_m
+data$y_salary_m <- y_salary_m
+data$y_total_m <- y_total_m
 
-y_ingLab_m = df$y_ingLab_m
+categoricals <- data %>%
+  dplyr::select(
+    -c(
+      age,
+      ingtot,
+      totalHoursWorked,
+      y_ingLab_m,
+      y_salary_m,
+      y_total_m
+    )
+  ) %>%
+  colnames()
 
-y_total_m =  df$y_total_m
+data[, categoricals] <- lapply(data[, categoricals], factor)
 
-data$y_ingLab_m = y_ingLab_m
+data <- data %>%
+  replace_na(
+    list(y_salary_m = mean(data$y_salary_m, na.rm = TRUE))
+  )
+## Missing Values in categorical replacing with mode
 
-data$y_salary_m = y_salary_m
+data$maxEducLevel[is.na(data$maxEducLevel)] <- 7
+data$regSalud[is.na(data$regSalud)] <- 1
 
-data$y_total_m = y_total_m
-
-categoricas <- c('estrato1','oficio','relab','maxEducLevel','regSalud','cotPension')
-for (v in categoricas) {
-  data[,v] <- as.factor(data[,v,drop=T])
-} 
-
-##Missing Values in categorical replacing with mode
-
-table(data$maxEducLevel)
-
-data$maxEducLevel[is.na(data$maxEducLevel)]<-7
-
-table(data$regSalud)
-
-data$regSalud[is.na(data$regSalud)]<-1
-
-## Descriptives
-skim(data)
-
-stargazer(data)
-
-# Check correlations (as scatterplots), distribution and print corrleation coefficient
-
-#db <- as_tibble(df) ## from dataframe to tibble
-#data2 <-df %>% select(matches("y_")) %>% colSums(na.rm=TRUE)
-
-data_plot <- data %>% select(-c('estrato1','oficio','relab','maxEducLevel','regSalud','cotPension'))
-
-corr <- round(cor(data_plot), 1)
-
-ggcorrplot(corr, method = 'circle', type = 'lower', lab = TRUE) +
-  ggtitle("Correlograma de base de ingresos") +
-  theme_minimal() +
-  theme(legend.position="none")
-
-##Histogram Ingreso
-
-ggplot(data, aes(x=ingtot))+ geom_histogram(bins=20, fill = "darkorange")+
-  ggtitle("Ingresos Totales") + labs(x="Ingreso Total", y = "Cantidad")+
-  theme_bw() 
-
-##Bar chart for categorical variables
-
-ggplot(data, aes(x = `estrato1`)) +
-  geom_bar( fill = "darkorange") +
-  xlab("Estrato") +
-  theme_bw()
-
-#################################Punto 3########################################
 # a
-
-lnincome <- log(y_salary_m)
-mod_female <- lm("lnincome ~ sex" , data= data)
+# Modelo básico
+mod_female <- lm(log(y_salary_m) ~ female, data = data)
 summary(mod_female)
-results2 = tidy(mod_female)
-stargazer(mod_female, dep.var.labels=c("Ln(income)") , out="./views/Modelo_sex_gap.tex")
 
-#b
-mod_Pfemale <- lm("lnincome ~ sex + (sex*age) + (sex*I(age^2)) + age + I(age^2)" , data= data)
-summary(mod_Pfemale)
-results3 = tidy(mod_Pfemale)
-stargazer(mod_Pfemale, dep.var.labels=c("Ln(income)") , out="./views/Modelo_age_earnings_profile.tex")
+data$lnincome <- log(y_salary_m)
 
+stargazer(mod_female, dep.var.labels = c("Ln(income)"), out = "./views/Modelo_sex_gap.tex")
+
+# b
+# Modelo gender GAP interaccion edad
+formula <- "log(y_salary_m) ~ female + female*age + female*I(age^2) + age + I(age^2)"
+mod_peak_female <- lm(formula, data)
+summary(mod_peak_female)
+
+
+stargazer(
+  mod_peak_female,
+  dep.var.labels = c("Ln(income)"),
+  out = "./views/Modelo_age_earnings_profile.tex"
+)
+
+# Grafico
+
+sd2 <- results3[3, 3]
+
+predict_mod_peak_female <- predict(mod_peak_female, interval = "confidence")
+predict_mod_peak_female <- as_tibble(predict_mod_peak_female)
+
+data %>% ggplot(aes(y = predict_mod_peak_female$fit, x = age, color = female)) +
+  geom_point() +
+  labs(
+    x = "Edad",
+    y = "Salario mensual predicho",
+    title = "Salarios Predichos vs. Edad (95% IC)"
+  ) +
+  geom_ribbon(
+    aes(ymin = predict_mod_peak_female$lwr, ymax = predict_mod_peak_female$upr),
+    alpha = 0.2
+  )
 
 # c
 
-## install fastDummies
-if(!require(fastDummies)) install.packages("fastDummies") ; require(fastDummies)
-require(fastDummies)
-data <- dummy_cols(data, select_columns = c('mes', 'oficio', 'relab', 'maxEducLevel', 'sizeFirm'), remove_first_dummy = TRUE, remove_selected_columns = TRUE)
-data2 <- data %>% select(sex, age, formal, totalHoursWorked, mes_2:maxEducLevel_7)
-data2$lnincome2 <- log(y_salary_m)
-data2 <- data2 %>% replace_na(list(lnincome2 = mean(data2$lnincome2, na.rm = TRUE)))
+data_with_dummies <- data %>% select(
+  y_salary_m,
+  age,
+  totalHoursWorked,
+  female,
+  sizeFirm,
+  relab,
+  maxEducLevel,
+  oficio
+)
 
-mod_PPfemale <- lm(lnincome2 ~ sex + (sex*age) + (sex*I(age^2)) + age + I(age^2)+., data= data2)
-summary(mod_PPfemale)
-results4 = tidy(mod_PPfemale)
-stargazer(mod_PPfemale, dep.var.labels=c("Ln(income)") , out="./views/Modelo_age_earnings_gap_controls.tex")
 
-names_vars <- data2 %>% dplyr::select(-c(2)) %>% colnames()
-independiente <- " ~ age"
-formulas <- paste0(names_vars, independiente)
+variables <- data_with_dummies %>%
+  select(-c(y_salary_m, female)) %>%
+  colnames()
+formula <- paste0(variables, collapse = " + ")
+formula1 <- paste("log(y_salary_m) ~", formula)
+formula2 <- paste("as.numeric(female) ~", formula)
 
-for(x in formulas) { 
-  data2[x] <- lm(x, data2)$residuals
+mod_res0 <- lm(log(y_salary_m) ~ ., data_with_dummies)
+mod_res1 <- lm(formula1, data_with_dummies)$residuals
+mod_res2 <- lm(formula2, data_with_dummies)$residuals
+mod_res3 <- lm(mod_res1 ~ mod_res2 - 1)
+
+data$mod_res1 <- lm(formula1, data_with_dummies)$residuals
+data$mod_res2 <- lm(formula2, data_with_dummies)$residuals
+
+# Bootstrap
+beta_est <- function(data, index) {
+  coef(lm(mod_res1 ~ mod_res2 - 1, data = data, subset = index))
 }
 
-data3 <- data2 %>% dplyr::select(matches("~ age$"))
-reg2<-lm(`lnincome2 ~ age` ~ . - 1, data = data3)
+set.seed(10)
+boot_fwl <- boot(data, beta_est1, R = 1000)
+# Bootstrap estimate
 
-# 0.0806
+boot_est <- boot_fwl$t0
+boot_est_se <- apply(boot_fwl$t, 2, sd)

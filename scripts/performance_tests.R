@@ -8,6 +8,7 @@ df <- read.csv("./stores/data.csv")
 ## Filter by age >18 & Cleaning Data set
 df <- df[df$age >= 18, ]
 df <- df[df$ocu == 1, ]
+df <- df %>% mutate(female = ifelse(sex == 1, 0, 1))
 
 data <- df %>%
     select(!matches(c(("^p[0-9]"), "^cc", "^io", "^y_", "^fex", "^hours"))) %>%
@@ -16,7 +17,7 @@ data <- df %>%
         -c(
             depto, dominio, clase, V1, wap, directorio, secuencia_p, pet, orden,
             mes, fweight, informal, cuentaPropia, pea, microEmpresa, ocu, dsi,
-            inac
+            inac, sex
         )
     ) %>%
     replace_na(list(oficio = 0, relab = 0, totalHoursWorked = 0))
@@ -29,10 +30,15 @@ data$y_salary_m <- y_salary_m
 data$y_total_m <- y_total_m
 
 categoricals <- data %>%
-    dplyr::select(-c(age, ingtot, totalHoursWorked)) %>%
+    dplyr::select(-c(age, ingtot, totalHoursWorked, y_ingLab_m, y_salary_m, y_total_m)) %>%
     colnames()
 
 data[, categoricals] <- lapply(data[, categoricals], factor)
+
+data <- data %>%
+    replace_na(
+        list(y_salary_m = mean(data$y_salary_m, na.rm = TRUE))
+    )
 
 set.seed(10)
 
@@ -46,23 +52,19 @@ train <- dplyr::select(train, -id)
 test <- dplyr::select(test, -id)
 
 # Solve issue when fitting a regression
-test <- test %>% semi_join(train, by = "relab")
+test <- test %>% semi_join(train, by = c("relab", "oficio"))
 
 formulas <- c(
-    "estrato1",
-    "sex",
-    "age",
-    "relab",
-    "cotPension",
-    "maxEducLevel",
-    "regSalud",
-    "totalHoursWorked"
+    "age + I(age ^ 2)",
+    "female*age + I(age ^ 2) + female:I(age ^ 2)",
+    "female + age + totalHoursWorked + sizeFirm + relab + maxEducLevel + oficio",
+    "poly(totalHoursWorked, 3)*sizeFirm + female",
+    "poly(age, 3) + maxEducLevel",
+    "poly(log(age), 3)*poly(log(totalHoursWorked), 3)"
 )
 
-dependent <- "ingtot ~ "
-
+dependent <- "log(y_salary_m) ~ "
 formulas <- paste0(dependent, formulas)
-
 
 
 lm_fit <- function(formula) {
@@ -85,34 +87,36 @@ best_models <- function(n) {
     attributes(best)$names
 }
 
-influences <- numeric()
-
-cl <- makeCluster(3, type = "SOCK")
+cl <- makeCluster(4, type = "SOCK")
 registerDoSNOW(cl)
 
 for (i in best_models(1)) {
-    foreach(j = 1:nrow(test), .combine = c) %dopar% {
+    influences <- foreach(j = 1:nrow(test), .combine = c) %dopar% {
         temp_set <- rbind(train, test[j, ])
         fit_best <- lm(i, temp_set)
         infl <- dffits(fit_best)
         influence <- infl[length(infl)]
-        influences[j] <- influence
-        return(influences)
+        influence
     }
 }
 
-stopCluster(cl)
-
-for (i in best_models(1)) {
-    for (j in 1:nrow(test)) {
-        temp_set <- rbind(train, test[j, ])
-        fit_best <- lm(i, temp_set)
-        infl <- dffits(fit_best)
-        influence <- infl[length(infl)]
-        influences[j] <- influence
-    }
-}
-
+histogram(influences)
 boxplot(influences)
 summary(influences)
-temp_set %>% tail()
+
+train_control <- trainControl(method = "LOOCV")
+
+
+trainer <- function(formula) {
+    caret::train(
+        as.formula(formula),
+        data = data,
+        method = "lm",
+        trControl = train_control,
+        na.action = na.omit
+    )
+}
+
+model1 <- trainer(best_models(2)[1])
+model2 <- trainer(best_models(2)[2])
+stopCluster(cl)
