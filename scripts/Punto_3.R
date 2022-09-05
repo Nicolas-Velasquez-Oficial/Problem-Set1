@@ -105,8 +105,6 @@ stargazer(
 
 # Grafico
 
-sd2 <- results3[3, 3]
-
 predict_mod_peak_female <- predict(mod_peak_female, interval = "confidence")
 predict_mod_peak_female <- as_tibble(predict_mod_peak_female)
 
@@ -157,7 +155,7 @@ beta_est <- function(data, index) {
 }
 
 set.seed(10)
-boot_fwl <- boot(data, beta_est1, R = 1000)
+boot_fwl <- boot(data, beta_est, R = 1000)
 # Bootstrap estimate
 
 boot_est <- boot_fwl$t0
