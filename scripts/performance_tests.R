@@ -3,19 +3,19 @@ library("caret")
 library("doSNOW")
 library("foreach")
 
-set.seed(10)
 
 # create ID column
 data$id <- 1:nrow(data)
 # use 70% of dataset as training set and 30% as test set
-train <- data %>% dplyr::sample_frac(0.70)
+
+train <- data %>% dplyr::slice_sample(prop = 0.70)
 test <- data %>% dplyr::anti_join(train, by = "id")
 data <- dplyr::select(data, -id)
 train <- dplyr::select(train, -id)
 test <- dplyr::select(test, -id)
 
 # Solve issue when fitting a regression
-test <- test %>% semi_join(train, by = c("relab", "oficio"))
+test <- test %>% semi_join(train, by = "relab")
 
 formulas <- c(
     "age + I(age ^ 2)",
@@ -80,10 +80,11 @@ trainer <- function(formula) {
     )
 }
 
-model1 <- trainer(best_models(2)[1])
-model2 <- trainer(best_models(2)[2])
+system.time({
+    model1 <- trainer(best_models(2)[1])
+    model2 <- trainer(best_models(2)[2])
+})
 stopCluster(cl)
 
-str(model1)
 model1$results
 model2$results
