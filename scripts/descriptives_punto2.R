@@ -60,7 +60,6 @@ beta.fn <- function(data, index) {
   coef(lm(ingtot ~ age + I(age^2), data = data, subset = index))
 }
 
-set.seed(1010)
 
 boot(data, beta.fn, R = 1000)
 
