@@ -68,16 +68,16 @@ plotbot <- boot(data, beta.fn, R = 1000)
 
 sd <- apply(plotbot$t, 2, sd)
 
-Intervalos <- as_tibble(predict(mod_age, interval = "confidence"))
+intervalos <- as_tibble(predict(mod_age, interval = "confidence"))
 
-Intervalos$lwr <- Intervalos$lwr - (1.96 * sd[2])
-Intervalos$upr <- Intervalos$upr + (1.96 * sd[2])
+intervalos$lwr <- intervalos$lwr - (1.96 * sd[2])
+intervalos$upr <- intervalos$upr + (1.96 * sd[2])
 
 ggplot(data, aes(y = predict(mod_age), x = age)) +
   labs(x = "Edad", y = "Salario predicho", title = "Salarios Predichos vs. Edad (95% IC)") +
   geom_point() +
   geom_ribbon(
-    aes(ymin = Intervalos$lwr, ymax = Intervalos$upr),
+    aes(ymin = intervalos$lwr, ymax = intervalos$upr),
     alpha = 0.2
   )
 
