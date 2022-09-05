@@ -30,36 +30,29 @@ df <- import(here("./stores/data.csv"))
 ##NOTE: Confirm if this should be '>' or '>=' 
 df <- df[df$age >=18,]
 df <- df[df$ocu ==1,]
+df <- df %>% mutate(female = if_else(sex==0, 1, 0))
 
-data <- df %>% select(!matches(c(("^p[0-9]"), "^cc", "^io", "^y_", "^fex", "^hours"))) %>% select(-(ina:ingtotes), -c(depto,dominio ,clase, V1, wap, directorio, secuencia_p, pet, orden, mes, fweight, informal, cuentaPropia, pea, microEmpresa, ocu, dsi, inac)) %>% replace_na(list(oficio = 0, relab = 0, totalHoursWorked = 0)) 
+data <- df %>% select(!matches(c(("^p[0-9]"), "^cc", "^io", "^y_", "^fex", "^hours"))) %>% select(-(ina:ingtotes), -c(depto,sex ,dominio ,clase, V1, wap, directorio, secuencia_p, pet, orden, fweight, informal, cuentaPropia, pea, microEmpresa, ocu, dsi, inac)) %>% replace_na(list(oficio = 0, relab = 0, totalHoursWorked = 0)) 
+
 
 y_salary_m = df$y_salary_m
-
 y_ingLab_m = df$y_ingLab_m
-
 y_total_m =  df$y_total_m
-
 data$y_ingLab_m = y_ingLab_m
-
 data$y_salary_m = y_salary_m
-
 data$y_total_m = y_total_m
-
 categoricas <- c('estrato1','oficio','relab','maxEducLevel','regSalud','cotPension')
 for (v in categoricas) {
   data[,v] <- as.factor(data[,v,drop=T])
 } 
-
-##Missing Values in categorical replacing with mode
-
+skim(data)
+######################Missing Values in categorical replacing with mode#########
 table(data$maxEducLevel)
-
 data$maxEducLevel[is.na(data$maxEducLevel)]<-7
-
 table(data$regSalud)
-
 data$regSalud[is.na(data$regSalud)]<-1
 
+<<<<<<< Updated upstream
 ## Descriptives
 skim(data)
 
@@ -131,3 +124,6 @@ mod_Pfemale <- lm("lnincome ~ sex + (sex*age) + (sex*I(age^2)) + age + I(age^2)"
 summary(mod_Pfemale)
 results3 = tidy(mod_Pfemale)
 stargazer(mod_Pfemale, dep.var.labels=c("Ln(income)") , out="./views/Modelo_age_earnings_profile.tex")
+=======
+  
+>>>>>>> Stashed changes
