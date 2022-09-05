@@ -20,11 +20,9 @@ Este docuemnto contiene el trabajo escrito del Problem Set 1 con los resultados 
 -   data.csv:
     Para la extracción de la base de datos, se relizó un raspado de la pagina web \href{https://ignaciomsarmiento.github.io/GEIH2018_sample/}{GEIH2018Sample} . De allí se obtuvo 10 tablas, estas se agruparon por nombre de columna, dando como resultado una base con 178 variables y 32.177 observaciones correspondientes a la GEIH del Dane del año 2008.
 
-## Carpeta File:
+## Carpeta Scripts:
 
 -   El análisis de datos se realiza utilizando el software R version 4.0.2 (2022-09-05)
-
--   main.sh: Contains the sequence of execution of dofiles and Rscripts to produce the figures and tables in the paper and appendix. Dofiles and Los Escripts en R se nombran segun la función que tienen:
     -   La carpeta scripts contine los codigos nombrados a continución:
 
         -   data_extraction.R
