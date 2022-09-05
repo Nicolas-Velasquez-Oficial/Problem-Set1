@@ -5,6 +5,7 @@ library("stargazer")
 library("boot")
 
 ################################### Descriptives#################################
+#####En esta parte se generan las tablas de descriptivos y correlaciones#########
 skim(data)
 glimpse(data)
 stargazer(data)
@@ -49,12 +50,14 @@ ggplot(data, aes(x = `maxEducLevel`)) +
   theme_bw()
 ################################# Punto 2########################################
 
+###Estimación del modelo de edad
 mod_age <- lm("ingtot ~ age + I(age^2)", data = data)
 
 summary(mod_age)
 results <- tidy(mod_age)
 stargazer(mod_age, dep.var.labels = c("Earnings"), out = "../views/Modelo_Age.tex")
 
+### Función para calcular errores estandar con boostrap
 
 beta.fn <- function(data, index) {
   coef(lm(ingtot ~ age + I(age^2), data = data, subset = index))
@@ -72,6 +75,8 @@ intervalos <- as_tibble(predict(mod_age, interval = "confidence"))
 intervalos$lwr <- intervalos$lwr - (1.96 * sd[2])
 intervalos$upr <- intervalos$upr + (1.96 * sd[2])
 
+
+###Gráfico de Salarios predichos contra edad e intervalos de confianza
 ggplot(data, aes(y = predict(mod_age), x = age)) +
   labs(x = "Edad", y = "Salario predicho", title = "Salarios Predichos vs. Edad (95% IC)") +
   geom_point() +
@@ -80,7 +85,7 @@ ggplot(data, aes(y = predict(mod_age), x = age)) +
     alpha = 0.2
   )
 
-
+###Calculo de Peak Age para la muestra
 ### Peak Age = -b1/2*b2
 lm_summary <- summary(mod_age)$coefficients
 
