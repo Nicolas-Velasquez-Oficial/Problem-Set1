@@ -83,3 +83,7 @@ trainer <- function(formula) {
 model1 <- trainer(best_models(2)[1])
 model2 <- trainer(best_models(2)[2])
 stopCluster(cl)
+
+str(model1)
+model1$results
+model2$results
