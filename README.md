@@ -2,8 +2,8 @@
 
 Este repositorio corresponde al Problem Set 1 del curso Big Data and Machine Learning for Applied Economics 2022.
 
-Datos y archivos de réplica para "Repositoiro para el curso Big Data and Machine Learning for Applied Economics Problem Set 1" por \href{https://github.com/cabonillah}{Camilo Bonilla}, \href{https://github.com/Nicolas-Velasquez-Oficial}{Nicolás Velásquez} y \href{https://github.com/rasantofimior}{Rafael Santofimio}
-
+Datos y archivos de réplica para "Repositoiro para el curso Big Data and Machine Learning for Applied Economics Problem Set 1" por 
+[Camilo Bonilla](https://github.com/cabonillah),  [Nicolás Velásquez](https://github.com/Nicolas-Velasquez-Oficial) y  [Rafael Santofimio](https://github.com/rasantofimior/)
 # Resumen
 
 Para el sector fiscal, la correcta implemetación de políticas públicas y reformas tributarias han sido temáticas importantes a la hora de poder formar naciones con sociedades crecientes en ingreso pero con redistribuciones que pérmitan una equidad para los sectores marginales con igualdad de oportunidades. En un mundo ideal el gobierno tendría control total al observar los ingresos de todas las personas, sin embargo actualmente las personas suelen subreportar estas cifras con temor a ser segmentada bajo una tasa proporsional a sus ingresos. Con base en lo anterior, se vuelve de suma importancia obtener herramientas que nos permitan tener estimaciones de los ingresos de las personas y llegar a cuestionarnos si debido a un subreporte de los mismos se estan teniendo impuestos suboptimos. Más importante aún si dentro de los multiples modelos posibles, el gobierno y entidades reguladoras se debería enfocar en ciertas observaciones atipicas para llegar a una estimación cercana.
