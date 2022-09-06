@@ -32,21 +32,19 @@ Este docuemnto contiene el trabajo escrito del Problem Set 1 con los resultados 
         -   performance_tests.R
 
 ## Carpeta Views:
-
-Las Figuras y tablas estan alojadas en la carpeta "views". 
- -   La carpeta Views contine las tablas y figuras nombrados a continución:
-    - Correlogram.png 
-    - Correlogram_Deps.png 
-    - Estrato.png 
-    - Histogram_Ing.png 
-    - Max_educlev.png
-    -Modelo_Age_Residuals.png
-    -Salarios_Predichos.png
-    -data.tex
-    -data.tex
-    -Modelo_age_earnings_controls_2.tex
-    -influencias1.png
-    -influencias2.png
+-  Views:
+    -   La carpeta Views contine las tablas y figuras nombrados a continución:
+        -   Correlogram.png 
+        -   Correlogram_Deps.png 
+        -   Estrato.png 
+        -   Histogram_Ing.png 
+        -   Max_educlev.png
+        -   Modelo_Age_Residuals.png
+        -   Salarios_Predichos.png
+        -   influencias1.png
+        -   influencias2.png
+        -   data.tex
+        -   Modelo_age_earnings_controls_2.tex
 
 Notas:
 
